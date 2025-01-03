@@ -66,7 +66,6 @@ def update_profile(profile: Dict, conversation):
     except Exception as e:
         logger.error(f"Error updating profile: {e}")
 
-    # Return the original profile if an error occurs
     return profile
 
 PROFILE_FILE = "profile.json"
