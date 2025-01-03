@@ -5,6 +5,8 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from telegram.ext import ContextTypes
 from telegram.request import HTTPXRequest
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 from src.assistant.handlers import start, handle_message, handle_voice_message
 import logging
 
