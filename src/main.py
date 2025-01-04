@@ -39,7 +39,6 @@ async def webhook(request: Request):
     await application.process_update(update)
     return {"status": "ok"}
 
-# Health check endpoint
 @app.get("/")
 async def home():
     return {"status": "Bot is running"}
