@@ -36,6 +36,13 @@ application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
 async def webhook(request: Request):
     data = await request.json()
     update = Update.de_json(data, application.bot)
+
+    # Ensure the application is initialized
+    if not application.is_initialized:
+        await application.initialize()
+        await application.start()
+
+    # Process the update
     await application.process_update(update)
     return {"status": "ok"}
 
