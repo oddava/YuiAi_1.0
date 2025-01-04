@@ -1,4 +1,6 @@
 import os
+
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from telegram import Update
@@ -41,3 +43,7 @@ async def webhook(request: Request):
 @app.get("/")
 async def home():
     return {"status": "Bot is running"}
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 5000))  # Default to port 5000 if PORT is not set
+    uvicorn.run(app, host="0.0.0.0", port=port)

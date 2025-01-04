@@ -78,6 +78,7 @@ def load_profile():
                 return json.load(file)
         except json.JSONDecodeError as e:
             logger.error(f"[ERROR] Failed to load profile: {e}")
+            return {}
     return {}
 
 def save_profile(profile):
