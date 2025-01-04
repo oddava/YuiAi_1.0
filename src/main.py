@@ -44,5 +44,5 @@ async def home():
     return {"status": "Bot is running"}
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))  # Default to port 5000 if PORT is not set
+    port = int(os.getenv("PORT", 5000))
     uvicorn.run(app, host="0.0.0.0", port=port)

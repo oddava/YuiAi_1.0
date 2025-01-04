@@ -1,10 +1,9 @@
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
 from src.agents.langgraph_agent import MemoryAgent, SummarizationAgent, ConversationAgent, ProfileAgent
 from src.agents.utils import tools
 from src.assistant.state import State
 from langgraph.graph import StateGraph, START, END
-from pymongo import MongoClient
-from langgraph.checkpoint.mongodb import MongoDBSaver
 import os
 MONGODB_URI = os.environ.get("MONGODB_URI")
 
@@ -53,10 +52,11 @@ workflow.add_edge("tool_agent", "conversation_agent")
 workflow.add_edge("profile_agent", "summarization_agent")
 workflow.add_edge("summarization_agent", END)
 
-mongodb_client = MongoClient(MONGODB_URI)
-checkpointer = MongoDBSaver(mongodb_client)
+# mongodb_client = MongoClient(MONGODB_URI)
+# checkpointer = MongoDBSaver(mongodb_client)
 
-# checkpointer = MemorySaver()
+checkpointer = MemorySaver()
+
 graph = workflow.compile(
     checkpointer=checkpointer,
 )
