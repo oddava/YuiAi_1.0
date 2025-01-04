@@ -34,6 +34,15 @@ application.add_handler(CommandHandler("start", start))
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
 
+
+# Define webhook endpoint
+async def on_startup():
+    logger.info("Initializing Telegram application...")
+    await application.initialize()
+
+# Add the startup event handler
+app.add_event_handler("startup", on_startup)
+
 # Define webhook endpoint
 @app.post("/webhook")
 async def webhook(request: Request):
@@ -62,3 +71,4 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logger.info(f"Starting server on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)
+    application.initialize()
