@@ -1,1 +1,9 @@
-{}
+{
+  "name": "Javlonbek",
+  "age": 18,
+  "hobbies": [
+    {"watching anime": ["sword art online"]},
+    "exercising"
+  ],
+  "location": "Tashkent"
+}

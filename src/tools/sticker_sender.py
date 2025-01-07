@@ -107,7 +107,7 @@ async def send_sticker_by_emotion(emotion):
             if response.status_code == 200:
                 # Mark the sticker as sent
                 sent_stickers[emotion].add(sticker_id)
-                return f"The sticker sent successfully!"
+                return f"(*the sticker has been sent successfully*)"
             else:
                 print(f"Failed to send sticker. Status code: {response.status_code}")
         except Exception as e:

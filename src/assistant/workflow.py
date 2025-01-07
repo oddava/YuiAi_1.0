@@ -1,5 +1,8 @@
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.mongodb import MongoDBSaver
 from langgraph.prebuilt import ToolNode
+from pymongo import MongoClient
+
 from src.agents.langgraph_agent import MemoryAgent, SummarizationAgent, ConversationAgent, ProfileAgent
 from src.agents.utils import tools
 from src.assistant.state import State
@@ -12,11 +15,9 @@ def should_continue(state: State):
     total_messages = len(state["messages"])
 
     if last_message.tool_calls:
-        # Ensure tools are executed and then return to conversation_agent
         return "tool_agent"
 
     elif total_messages > 15:
-        # Summarize if message count exceeds 15
         return "profile_agent"
 
     return END
@@ -52,10 +53,9 @@ workflow.add_edge("tool_agent", "conversation_agent")
 workflow.add_edge("profile_agent", "summarization_agent")
 workflow.add_edge("summarization_agent", END)
 
-# mongodb_client = MongoClient(MONGODB_URI)
-# checkpointer = MongoDBSaver(mongodb_client)
-
-checkpointer = MemorySaver()
+mongodb_client = MongoClient(MONGODB_URI)
+checkpointer = MongoDBSaver(mongodb_client)
+# checkpointer = MemorySaver()
 
 graph = workflow.compile(
     checkpointer=checkpointer,

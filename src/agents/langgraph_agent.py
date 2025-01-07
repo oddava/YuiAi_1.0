@@ -2,7 +2,7 @@ from typing import Dict
 from dotenv import load_dotenv
 from langchain.memory import chat_memory
 
-from src.agents.utils import collection, get_relevant_memory, llm, llm_with_tools
+from src.agents.utils import collection, get_relevant_memory, llm, llm_with_tools, llm_for_check
 from src.memory.long_term_memory import store_memory
 from langchain_core.messages import HumanMessage, RemoveMessage, SystemMessage, AIMessage
 import logging
@@ -20,14 +20,15 @@ class SummarizationAgent:
 
         summary = state.get("summary", "")
         summary_prompt = (
-            f"Update the following summary with new conversation provided. The summary should be a concise, bulleted list of key actions and decisions. Keep the length around 800 characters. Existing summary: {summary}\n\nNew messages:\n"
+            f"Update the following summary with new conversation provided. The summary should be a concise, bulleted list of key actions and decisions. Keep the length around 800 characters. Do not add any explanatory text. Existing summary: {summary}\n\nNew messages:\n"
             if summary
             else "Summarize the following conversation as a concise, bulleted list of key actions and decisions:\n"
         )
 
         messages = state["messages"] + [HumanMessage(content=summary_prompt)]
 
-        response = llm.invoke(messages)
+        response = llm_for_check.invoke(messages)
+        store_memory(state["messages"][-1].content, response.content, collection)
         logger.info(f"[DEBUG] Summarized: {response.content}")
         delete_messages = [RemoveMessage(id=m.id) for m in state["messages"][:-5]]
         logger.info(f"[DEBUG] Deleting messages: {[m.id for m in state['messages'][:-5]]}")
@@ -57,8 +58,6 @@ class ConversationAgent:
         response = llm_with_tools.invoke(messages)
         logger.info(f"[DEBUG] Chatbot response: {response.content}")
 
-        latest_human_message = state["messages"][-1].content
-        store_memory(latest_human_message, response.content, collection)
         logger.info(f"[INFO]Memory Stored Successfully")
 
         return {"messages": [response]}
@@ -70,12 +69,16 @@ class ProfileAgent:
 
         # Extract conversation messages
         conversation = state.get("messages", [])
-        profile = state.get("profile", "")
+        profile = state.get("profile", {})
 
         try:
             conversation = simplify_conversation(conversation)
             updated_profile = update_profile(profile, conversation)
-            print(f"[DEBUG] Profile Updated: {updated_profile}")
+
+            if not updated_profile:
+                logger.warning("[WARNING] No changes detected in the profile.")
+
+            logger.debug(f"[DEBUG] Profile Updated: {updated_profile}")
             state.update({"profile": updated_profile})
             save_profile(updated_profile)
         except Exception as e:
@@ -83,6 +86,7 @@ class ProfileAgent:
             return {"error": str(e)}
 
         return {"profile": updated_profile}
+
 
 #---------- MEMORY -------------#
 class MemoryAgent:

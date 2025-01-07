@@ -6,7 +6,7 @@ import chromadb
 from chromadb import Settings
 import logging
 
-# from src.tools.fetch_entities import sync_fetch_entities
+from src.tools.fetch_entities import sync_fetch_telegram_entities
 # from src.tools.send_message import sync_send_message
 from src.tools.sticker_sender import sync_send_sticker
 
@@ -28,7 +28,8 @@ collection = client.get_or_create_collection(name="assistant_memory")
 
 llm = ChatGroq(groq_api_key=GROQ_API_KEY, model_name=CHAT_LLM_NAME)
 tavily_search = TavilySearchResults(max_results=3)
-tools = [tavily_search, sync_send_sticker]
+
+tools = [tavily_search, sync_send_sticker, sync_fetch_telegram_entities]
 llm_with_tools = llm.bind_tools(tools)
 llm_for_check = ChatGroq(groq_api_key=GROQ_API_KEY, model_name=WORKER_LLM_NAME)
 
