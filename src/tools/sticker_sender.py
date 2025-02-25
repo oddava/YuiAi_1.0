@@ -5,9 +5,13 @@ import os
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 import asyncio
+from telegram import Update
+from tenacity import retry_if_exception_type
+
+from src.main import application
+from src.tools.youtube_video_downloader import chat_id
 
 load_dotenv()
-chat_id = os.getenv("CHAT_ID")
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 STICKER_SET_NAME = os.getenv("STICKER_SET_NAME")
 
@@ -24,6 +28,27 @@ essential_emotions = {
     "disgust": ["🤢", "🤮", "😖", "😷"],
     "neutral": ["😐", "😑", "😶"],
 }
+
+# Function to add a sticker set to the bot's list
+def add_sticker_set_to_list(sticker_set_name):
+    try:
+        stickers = get_sticker_set(sticker_set_name, TOKEN)
+        categorized_stickers = categorize_stickers_by_emotion(stickers)
+
+        # Merge new stickers with the existing emotion dictionary
+        for emotion, new_stickers in categorized_stickers.items():
+            if emotion in emotion_dict:
+                emotion_dict[emotion].extend(new_stickers)
+                emotion_dict[emotion] = list(set(emotion_dict[emotion]))  # Remove duplicates
+            else:
+                emotion_dict[emotion] = new_stickers
+
+        # Save the updated data to the file
+        with open("sticker_set.json", "w") as file:
+            json.dump(emotion_dict, file, indent=4)
+        print(f"[INFO] Sticker set '{sticker_set_name}' added successfully.")
+    except Exception as e:
+        print(f"[ERROR] Failed to add sticker set: {e}")
 
 # Function to fetch the sticker set from Telegram
 def get_sticker_set(sticker_set_name, bot_token):
@@ -122,10 +147,10 @@ async def send_sticker_async_wrapper(emotion):
 @tool
 def sync_send_sticker(emotion):
     """
-        Send a sticker based on the mood or sentinel of your response.
+    Send a sticker based on the mood or sentinel of your response.
 
-        Parameters:
-            emotion (str): One of ["joy", "happiness", "sadness", "anger", "mad", "fear", "love", "surprise", "disgust", "neutral"].
-                           Defaults to "neutral" if not provided or invalid.
+    Parameters:
+        emotion (str): One of ["joy", "happiness", "sadness", "anger", "mad", "fear", "love", "surprise", "disgust", "neutral"].
+                       Defaults to "neutral" if not provided or invalid.
     """
     return asyncio.run(send_sticker_async_wrapper(emotion))

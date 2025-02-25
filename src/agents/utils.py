@@ -7,7 +7,6 @@ from chromadb import Settings
 import logging
 
 from src.tools.fetch_entities import sync_fetch_telegram_entities
-# from src.tools.send_message import sync_send_message
 from src.tools.sticker_sender import sync_send_sticker
 
 # Set up the logger
@@ -17,6 +16,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_CONVO_API_KEY = os.getenv("GROQ_CONVO_API_KEY")
 WORKER_LLM_NAME = os.getenv("WORKER_LLM_NAME")
 CHAT_LLM_NAME = os.getenv("CHAT_LLM_NAME")
 PERSIST_DIR = os.getenv("PERSIST_DIR")
@@ -26,12 +26,12 @@ TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 client = chromadb.PersistentClient(path=PERSIST_DIR, settings=Settings(anonymized_telemetry=False))
 collection = client.get_or_create_collection(name="assistant_memory")
 
-llm = ChatGroq(groq_api_key=GROQ_API_KEY, model_name=CHAT_LLM_NAME)
+llm = ChatGroq(api_key=GROQ_CONVO_API_KEY, model=CHAT_LLM_NAME)
 tavily_search = TavilySearchResults(max_results=3)
 
 tools = [tavily_search, sync_send_sticker, sync_fetch_telegram_entities]
 llm_with_tools = llm.bind_tools(tools)
-llm_for_check = ChatGroq(groq_api_key=GROQ_API_KEY, model_name=WORKER_LLM_NAME)
+llm_for_check = ChatGroq(api_key=GROQ_API_KEY, model=WORKER_LLM_NAME)
 
 def get_relevant_memory(query: str, n_results: int):
     # Query memory database

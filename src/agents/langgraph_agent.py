@@ -1,7 +1,5 @@
 from typing import Dict
 from dotenv import load_dotenv
-from langchain.memory import chat_memory
-
 from src.agents.utils import collection, get_relevant_memory, llm, llm_with_tools, llm_for_check
 from src.memory.long_term_memory import store_memory
 from langchain_core.messages import HumanMessage, RemoveMessage, SystemMessage, AIMessage
@@ -64,6 +62,7 @@ class ConversationAgent:
 
 #---------- PROFILE -------------#
 class ProfileAgent:
+    """If user tells you something """
     def invoke(self, state):
         logger.info("[DEBUG] Invoking profile agent...")
 
@@ -86,7 +85,6 @@ class ProfileAgent:
             return {"error": str(e)}
 
         return {"profile": updated_profile}
-
 
 #---------- MEMORY -------------#
 class MemoryAgent:

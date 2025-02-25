@@ -1,12 +1,18 @@
 {
-  "name": "Master",
+  "name": "Javlon",
   "interests": [
-    "sharing stickers",
-    "exchanging emojis",
-    "learning Russian"
+    "cute animal stickers",
+    "fun anime-style stickers",
+    "learning Python OOP"
   ],
   "location": {
-    "city": "Tashkent"
+    "city": "",
+    "country": ""
   },
-  "role": "Unknown"
+  "sticker_preferences": [
+    "happy",
+    "cute animal",
+    "fun anime-style"
+  ],
+  "likes_movies": []
 }

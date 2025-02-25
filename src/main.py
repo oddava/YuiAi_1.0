@@ -28,16 +28,16 @@ app = FastAPI()
 application = Application.builder().token(TOKEN).build()
 
 # Import and add handlers
-from src.assistant.handlers import start, handle_message, handle_voice_message
+from src.assistant.handlers import start, handle_message, handle_voice_message, handle_sticker
 
 application.add_handler(CommandHandler("start", start))
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
-
+application.add_handler(MessageHandler(filters.Sticker.ALL, handle_sticker))
 
 # Define webhook endpoint
 async def on_startup():
-    logger.info("Initializing Telegram application...")
+    logger.info("Initializing Telegram application..")
     await application.initialize()
 
 # Add the startup event handler

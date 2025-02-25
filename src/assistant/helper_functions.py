@@ -1,9 +1,7 @@
 from dotenv import load_dotenv
 from groq import Groq
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-from telegram import Update
 import os
-from telegram.helpers import escape_markdown
 import logging
 
 load_dotenv()
